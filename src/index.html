@@ -53,8 +53,8 @@
                 const data = await response.json();
                 console.log('Response Data:', data);  // Debug: Inspect the structure of the response
 
-                // Adjust based on the actual structure of the response
-                const pdfUrl = data.body.pdfUrl; // Safely access pdfUrl using optional chaining
+                // Access pdfUrl directly from the data object
+                const pdfUrl = data.pdfUrl; 
 
                 if (pdfUrl && window.adobeDCView) {
                     // Use Adobe Embed API to preview the PDF
