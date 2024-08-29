@@ -24,10 +24,14 @@
     <div id="adobe-dc-view"></div>
 
     <script>
+        // Flag to check if Adobe Embed API is initialized
+        let isAdobeAPIInitialized = false;
+
         // Initialize Adobe Embed API
         document.addEventListener("adobe_dc_view_sdk.ready", function () {
             window.adobeDCView = new AdobeDC.View({ clientId: "531f3aca674349c489bbff2682a1e152", divId: "adobe-dc-view" });
             console.log('Adobe Embed API initialized.');
+            isAdobeAPIInitialized = true;  // Set the flag to true when initialized
         });
 
         async function submitForm() {
@@ -58,9 +62,9 @@
                 const pdfUrl = data.pdfUrl; 
                 console.log('PDF URL:', pdfUrl);
 
-                // Check if the pdfUrl is present and Adobe Embed API is initialized
+                // Wait until the Adobe Embed API is initialized
                 if (pdfUrl) {
-                    if (window.adobeDCView) {
+                    if (isAdobeAPIInitialized) {
                         // Use Adobe Embed API to preview the PDF
                         window.adobeDCView.previewFile({
                             content: { location: { url: pdfUrl } },
@@ -68,13 +72,28 @@
                         }, {});
                         console.log('PDF is being displayed.');
                     } else {
-                        console.error('Adobe Embed API is not initialized.');
+                        console.error('Adobe Embed API is not initialized. Waiting for initialization...');
+                        // Wait for initialization and retry after a delay
+                        waitForAdobeAPIInitialization(pdfUrl);
                     }
                 } else {
                     console.error('PDF URL not found in response:', data);
                 }
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+
+        // Function to wait for Adobe API to be initialized
+        function waitForAdobeAPIInitialization(pdfUrl) {
+            if (isAdobeAPIInitialized) {
+                window.adobeDCView.previewFile({
+                    content: { location: { url: pdfUrl } },
+                    metaData: { fileName: "index.pdf" }
+                }, {});
+                console.log('PDF is being displayed after waiting.');
+            } else {
+                setTimeout(() => waitForAdobeAPIInitialization(pdfUrl), 500);  // Check every 500 ms
             }
         }
     </script>
