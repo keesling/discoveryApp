@@ -41,7 +41,7 @@
             });
 
             const data = await response.json();
-            const pdfUrl = data.pdfUrl; // Assuming the flow returns a JSON with the PDF URL
+            const pdfUrl = data.body.pdfUrl;; // Assuming the flow returns a JSON with the PDF URL
 
             // Initialize Adobe Embed API
             document.addEventListener("adobe_dc_view_sdk.ready", function () {
