@@ -3,45 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Form</title>
+    <title>PDF Viewer</title>
+    <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
 </head>
 <body>
-    <form id="companyForm">
+    <form id="inputForm">
         <label for="roles">Roles:</label>
         <input type="text" id="roles" name="roles" value="CEO"><br><br>
-        
         <label for="industry">Industry:</label>
         <input type="text" id="industry" name="industry" value="Financial Services"><br><br>
-        
         <label for="companyName">Company Name:</label>
         <input type="text" id="companyName" name="companyName" value="ACME"><br><br>
-        
         <label for="participantNames">Participant Names:</label>
         <input type="text" id="participantNames" name="participantNames" value="John Doe"><br><br>
-        
         <label for="companySituation">Company Situation:</label>
-        <input type="text" id="companySituation" name="companySituation" value="Company has unresolved support issues"><br><br>
-        
+        <input type="text" id="companySituation" name="companySituation" value="Company currently has unresolved support issues"><br><br>
         <button type="button" onclick="submitForm()">Submit</button>
     </form>
 
-    <script>
-        function submitForm() {
-            const form = document.getElementById('companyForm');
-            const data = new FormData(form);
-            const jsonData = {};
-            data.forEach((value, key) => { jsonData[key] = value });
+    <div id="adobe-dc-view"></div>
 
-            fetch('YOUR_POWER_AUTOMATE_FLOW_HTTP_ENDPOINT', {
+    <script>
+        async function submitForm() {
+            const roles = document.getElementById('roles').value;
+            const industry = document.getElementById('industry').value;
+            const companyName = document.getElementById('companyName').value;
+            const participantNames = document.getElementById('participantNames').value;
+            const companySituation = document.getElementById('companySituation').value;
+
+            // Call Power Automate flow
+            const response = await fetch('YOUR_POWER_AUTOMATE_FLOW_URL', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(jsonData)
-            })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
+                body: JSON.stringify({ roles, industry, companyName, participantNames, companySituation })
+            });
+
+            const data = await response.json();
+            const pdfUrl = data.pdfUrl; // Assuming the flow returns a JSON with the PDF URL
+
+            // Initialize Adobe Embed API
+            document.addEventListener("adobe_dc_view_sdk.ready", function () {
+                var adobeDCView = new AdobeDC.View({ clientId: "YOUR_CLIENT_ID", divId: "adobe-dc-view" });
+
+                adobeDCView.previewFile({
+                    content: { location: { url: pdfUrl } },
+                    metaData: { fileName: "GeneratedDocument.pdf" }
+                }, {});
+            });
         }
     </script>
 </body>
