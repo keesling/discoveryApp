@@ -51,7 +51,10 @@
                 }
 
                 const data = await response.json();
-                const pdfUrl = data.body.pdfUrl; // Correct path
+                console.log('Response Data:', data);  // Debug: Inspect the structure of the response
+
+                // Adjust based on the actual structure of the response
+                const pdfUrl = data.body?.pdfUrl; // Safely access pdfUrl using optional chaining
 
                 if (pdfUrl && window.adobeDCView) {
                     // Use Adobe Embed API to preview the PDF
@@ -60,7 +63,7 @@
                         metaData: { fileName: "index.pdf" }
                     }, {});
                 } else {
-                    console.error('PDF URL not found in response');
+                    console.error('PDF URL not found in response:', data);
                 }
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
