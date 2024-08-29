@@ -27,6 +27,7 @@
         // Initialize Adobe Embed API
         document.addEventListener("adobe_dc_view_sdk.ready", function () {
             window.adobeDCView = new AdobeDC.View({ clientId: "531f3aca674349c489bbff2682a1e152", divId: "adobe-dc-view" });
+            console.log('Adobe Embed API initialized.');
         });
 
         async function submitForm() {
@@ -55,13 +56,20 @@
 
                 // Access pdfUrl directly from the data object
                 const pdfUrl = data.pdfUrl; 
+                console.log('PDF URL:', pdfUrl);
 
-                if (pdfUrl && window.adobeDCView) {
-                    // Use Adobe Embed API to preview the PDF
-                    window.adobeDCView.previewFile({
-                        content: { location: { url: pdfUrl } },
-                        metaData: { fileName: "index.pdf" }
-                    }, {});
+                // Check if the pdfUrl is present and Adobe Embed API is initialized
+                if (pdfUrl) {
+                    if (window.adobeDCView) {
+                        // Use Adobe Embed API to preview the PDF
+                        window.adobeDCView.previewFile({
+                            content: { location: { url: pdfUrl } },
+                            metaData: { fileName: "index.pdf" }
+                        }, {});
+                        console.log('PDF is being displayed.');
+                    } else {
+                        console.error('Adobe Embed API is not initialized.');
+                    }
                 } else {
                     console.error('PDF URL not found in response:', data);
                 }
