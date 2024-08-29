@@ -58,12 +58,11 @@
                 const pdfUrl = data.pdfUrl; 
                 console.log('PDF URL:', pdfUrl);
 
-                // Check if the pdfUrl is present and Adobe Embed API is initialized
+                // Display the PDF directly using Adobe Embed API without fetching it
                 if (typeof pdfUrl === 'string' && pdfUrl.trim() !== '') {
                     if (window.adobeDCView) {
-                        // Use Adobe Embed API to preview the PDF
                         window.adobeDCView.previewFile({
-                            content: { location: { url: pdfUrl } },
+                            content: { location: { url: pdfUrl }, contentType: "pdf_url" },
                             metaData: { fileName: "index.pdf" }
                         }, {});
                         console.log('PDF is being displayed.');
