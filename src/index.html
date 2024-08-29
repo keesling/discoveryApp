@@ -58,15 +58,20 @@
                 const pdfUrl = data.pdfUrl; 
                 console.log('PDF URL:', pdfUrl);
 
-                // Display the PDF directly using Adobe Embed API
-                if (pdfUrl && window.adobeDCView) {
-                    window.adobeDCView.previewFile({
-                        content: { location: { url: pdfUrl } },
-                        metaData: { fileName: "index.pdf" }
-                    }, {});
-                    console.log('PDF is being displayed.');
+                // Check if the pdfUrl is present and Adobe Embed API is initialized
+                if (typeof pdfUrl === 'string' && pdfUrl.trim() !== '') {
+                    if (window.adobeDCView) {
+                        // Use Adobe Embed API to preview the PDF
+                        window.adobeDCView.previewFile({
+                            content: { location: { url: pdfUrl } },
+                            metaData: { fileName: "index.pdf" }
+                        }, {});
+                        console.log('PDF is being displayed.');
+                    } else {
+                        console.error('Adobe Embed API is not initialized.');
+                    }
                 } else {
-                    console.error('PDF URL not found in response:', data);
+                    console.error('PDF URL is empty or not a valid string:', data);
                 }
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
