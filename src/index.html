@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer</title>
+    <title>PDF Viewer in Promise Mode</title>
     <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
 </head>
 <body>
@@ -24,9 +24,8 @@
     <div id="adobe-dc-view"></div>
 
     <script>
-        // Initialize Adobe Embed API
         document.addEventListener("adobe_dc_view_sdk.ready", function () {
-            window.adobeDCView = new AdobeDC.View({ clientId: "1dbd70b7c89545ff8d943d30eac2dcd4", divId: "adobe-dc-view" });
+            window.adobeDCView = new AdobeDC.View({ clientId: "531f3aca674349c489bbff2682a1e152", divId: "adobe-dc-view" });
             console.log('Adobe Embed API initialized.');
         });
 
@@ -38,7 +37,7 @@
             const companySituation = document.getElementById('companySituation').value;
 
             try {
-                // Call Power Automate flow
+                // Call Power Automate flow to get the PDF content in base64
                 const response = await fetch('https://prod-15.canadacentral.logic.azure.com:443/workflows/8151b9e5c79a424faddd0961abbc0494/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IkqSmmRpGzgxMWKyPqWiTZGfcN7_ymngmde6-ABJZcE', {
                     method: 'POST',
                     headers: {
@@ -54,24 +53,31 @@
                 const data = await response.json();
                 console.log('Response Data:', data);  // Debug: Inspect the structure of the response
 
-                // Access pdfUrl directly from the data object
-                const pdfUrl = data.pdfUrl; 
-                console.log('PDF URL:', pdfUrl);
-
-                // Display the PDF directly using Adobe Embed API without fetching it
-                if (typeof pdfUrl === 'string' && pdfUrl.trim() !== '') {
-                    if (window.adobeDCView) {
-                        window.adobeDCView.previewFile({
-                            content: { location: { url: pdfUrl }, contentType: "pdf_url" },
-                            metaData: { fileName: "index.pdf" }
-                        }, {});
-                        console.log('PDF is being displayed.');
-                    } else {
-                        console.error('Adobe Embed API is not initialized.');
-                    }
-                } else {
-                    console.error('PDF URL is empty or not a valid string:', data);
+                // Get the base64 content of the PDF
+                const pdfBase64 = data.pdfBase64;
+                if (!pdfBase64) {
+                    throw new Error('PDF Base64 content not found in the response.');
                 }
+
+                // Convert base64 to binary data
+                const byteCharacters = atob(pdfBase64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                // Use Adobe PDF Embed API in Promise Mode
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    window.adobeDCView.previewFile({
+                        content: { promise: Promise.resolve(reader.result) },
+                        metaData: { fileName: "sample.pdf" }
+                    }, {});
+                    console.log('PDF is being displayed using promise mode.');
+                };
+                reader.readAsArrayBuffer(blob);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
