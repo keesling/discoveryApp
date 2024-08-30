@@ -3,35 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer</title>
+    <title>Discovery Guide for Adobe Acrobat AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #e23e57;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        p.description {
+            text-align: center;
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #e23e57;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #e23e57;
+            box-shadow: 0 0 5px rgba(226, 62, 87, 0.2);
+        }
+
+        .form-group i {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            color: #e23e57;
+        }
+
+        .form-group .tooltip {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 15px;
+            background-color: #e23e57;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #c53048;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .footer-link {
+            color: #e23e57;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+    </style>
     <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
 </head>
 <body>
-    <form id="inputForm">
-        <label for="roles">Roles:</label>
-        <input type="text" id="roles" name="roles" value="CEO"><br><br>
-        <label for="industry">Industry:</label>
-        <input type="text" id="industry" name="industry" value="Financial Services"><br><br>
-        <label for="companyName">Company Name:</label>
-        <input type="text" id="companyName" name="companyName" value="ACME"><br><br>
-        <label for="participantNames">Participant Names:</label>
-        <input type="text" id="participantNames" name="participantNames" value="John Doe"><br><br>
-        <label for="companySituation">Company Situation:</label>
-        <input type="text" id="companySituation" name="companySituation" value="Company currently has unresolved support issues"><br><br>
-        <button type="button" onclick="submitForm()">Submit</button>
-    </form>
+
+    <div class="container">
+        <h1><i class="fas fa-clipboard-list"></i> Discovery Guide Preparation</h1>
+        <p class="description">Prepare for your next discovery call with Adobe Acrobat AI Assistant by filling out the guide below.</p>
+        
+        <form id="inputForm">
+            <div class="form-group">
+                <label for="roles">Roles:</label>
+                <input type="text" id="roles" name="roles" value="CEO">
+                <i class="fas fa-user-tie"></i>
+                <div class="tooltip">Specify the role of the decision-makers involved in the discovery call.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="industry">Industry:</label>
+                <input type="text" id="industry" name="industry" value="Financial Services">
+                <i class="fas fa-industry"></i>
+                <div class="tooltip">Mention the industry the client operates in.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" name="companyName" value="ACME">
+                <i class="fas fa-building"></i>
+                <div class="tooltip">Enter the company name of the client.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="participantNames">Participant Names:</label>
+                <input type="text" id="participantNames" name="participantNames" value="John Doe">
+                <i class="fas fa-users"></i>
+                <div class="tooltip">List the names of all participants in the discovery call.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="companySituation">Company Situation:</label>
+                <input type="text" id="companySituation" name="companySituation" value="Company currently has unresolved support issues">
+                <i class="fas fa-info-circle"></i>
+                <div class="tooltip">Provide a brief description of the company's current situation or challenges.</div>
+            </div>
+
+            <button type="button" onclick="submitForm()"><i class="fas fa-file-pdf"></i> Convert HTML to PDF</button>
+        </form>
+
+        <footer>
+            <p>Powered by <a href="https://www.adobe.com" class="footer-link">Adobe Acrobat AI Assistant</a>. Prepare your sales team with actionable insights.</p>
+        </footer>
+    </div>
 
     <div id="adobe-dc-view"></div>
 
     <script>
-        // Flag to check if Adobe Embed API is initialized
+        // Initialize Adobe Embed API
         let isAdobeAPIInitialized = false;
 
-        // Initialize Adobe Embed API
-        document.addEventListener("adobe_dc_view_sdk.ready", function () {
+        document.addEventListener("adobe_dc_view_sdk.ready", function() {
             window.adobeDCView = new AdobeDC.View({ clientId: "531f3aca674349c489bbff2682a1e152", divId: "adobe-dc-view" });
             console.log('Adobe Embed API initialized.');
-            isAdobeAPIInitialized = true;  // Set the flag to true when initialized
+            isAdobeAPIInitialized = true;
         });
 
         async function submitForm() {
@@ -42,12 +184,9 @@
             const companySituation = document.getElementById('companySituation').value;
 
             try {
-                // Call Power Automate flow
                 const response = await fetch('https://prod-15.canadacentral.logic.azure.com:443/workflows/8151b9e5c79a424faddd0961abbc0494/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IkqSmmRpGzgxMWKyPqWiTZGfcN7_ymngmde6-ABJZcE', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roles, industry, companyName, participantNames, companySituation })
                 });
 
@@ -56,16 +195,13 @@
                 }
 
                 const data = await response.json();
-                console.log('Response Data:', data);  // Debug: Inspect the structure of the response
+                console.log('Response Data:', data); 
 
-                // Access pdfUrl directly from the data object
                 const pdfUrl = data.pdfUrl; 
                 console.log('PDF URL:', pdfUrl);
 
-                // Wait until the Adobe Embed API is initialized
                 if (pdfUrl) {
                     if (isAdobeAPIInitialized) {
-                        // Use Adobe Embed API to preview the PDF
                         window.adobeDCView.previewFile({
                             content: { location: { url: pdfUrl } },
                             metaData: { fileName: "index.pdf" }
@@ -73,7 +209,6 @@
                         console.log('PDF is being displayed.');
                     } else {
                         console.error('Adobe Embed API is not initialized. Waiting for initialization...');
-                        // Wait for initialization and retry after a delay
                         waitForAdobeAPIInitialization(pdfUrl);
                     }
                 } else {
@@ -84,7 +219,6 @@
             }
         }
 
-        // Function to wait for Adobe API to be initialized
         function waitForAdobeAPIInitialization(pdfUrl) {
             if (isAdobeAPIInitialized) {
                 window.adobeDCView.previewFile({
@@ -93,7 +227,7 @@
                 }, {});
                 console.log('PDF is being displayed after waiting.');
             } else {
-                setTimeout(() => waitForAdobeAPIInitialization(pdfUrl), 500);  // Check every 500 ms
+                setTimeout(() => waitForAdobeAPIInitialization(pdfUrl), 500);
             }
         }
     </script>
