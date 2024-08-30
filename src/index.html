@@ -24,9 +24,18 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo img {
+            width: 80px;
+        }
+
         h1 {
             text-align: center;
-            color: #e23e57;
+            color: #FA0C00;
             font-weight: 700;
             margin-bottom: 20px;
         }
@@ -50,7 +59,7 @@
 
         .form-group label {
             font-weight: bold;
-            color: #e23e57;
+            color: #FA0C00;
         }
 
         .form-group input {
@@ -64,15 +73,15 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #e23e57;
-            box-shadow: 0 0 5px rgba(226, 62, 87, 0.2);
+            border-color: #FA0C00;
+            box-shadow: 0 0 5px rgba(250, 12, 0, 0.2);
         }
 
         .form-group i {
             position: absolute;
             right: 10px;
             top: 35px;
-            color: #e23e57;
+            color: #FA0C00;
         }
 
         .form-group .tooltip {
@@ -83,7 +92,7 @@
 
         button {
             padding: 15px;
-            background-color: #e23e57;
+            background-color: #FA0C00;
             color: white;
             border: none;
             border-radius: 5px;
@@ -93,7 +102,7 @@
         }
 
         button:hover {
-            background-color: #c53048;
+            background-color: #d00b00;
         }
 
         footer {
@@ -104,7 +113,7 @@
         }
 
         .footer-link {
-            color: #e23e57;
+            color: #FA0C00;
             text-decoration: none;
         }
 
@@ -117,6 +126,11 @@
 <body>
 
     <div class="container">
+        <!-- Adobe Logo -->
+        <div class="logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Adobe_Corporate_Logo.png/800px-Adobe_Corporate_Logo.png" alt="Adobe Logo">
+        </div>
+
         <h1><i class="fas fa-clipboard-list"></i> Discovery Guide Preparation</h1>
         <p class="description">Prepare for your next discovery call with Adobe Acrobat AI Assistant by filling out the guide below.</p>
         
@@ -156,7 +170,8 @@
                 <div class="tooltip">Provide a brief description of the company's current situation or challenges.</div>
             </div>
 
-            <button type="button" onclick="submitForm()"><i class="fas fa-file-pdf"></i>Generate Discovery Guide</button>
+            <!-- Updated Button Text -->
+            <button type="button" onclick="submitForm()"><i class="fas fa-file-pdf"></i> Generate Discovery Guide</button>
         </form>
 
         <footer>
