@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer in Promise Mode</title>
-    <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+    <title>PDF Viewer</title>
+    <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
 </head>
 <body>
     <form id="inputForm">
@@ -18,27 +18,37 @@
         <input type="text" id="participantNames" name="participantNames" value="John Doe"><br><br>
         <label for="companySituation">Company Situation:</label>
         <input type="text" id="companySituation" name="companySituation" value="Company currently has unresolved support issues"><br><br>
-        <button type="button" onclick="submitForm()">Convert HTML to PDF</button> <!-- Corrected button click handler -->
+        <button type="button" onclick="submitForm()">Submit</button>
     </form>
 
     <div id="adobe-dc-view"></div>
 
     <script>
-        document.addEventListener("adobe_dc_view_sdk.ready", function() {
-            // Initialize the AdobeDC View object
-            var adobeDCView = new AdobeDC.View({ clientId: "<YOUR_CLIENT_ID>", divId: "adobe-dc-view" });
+        // Flag to check if Adobe Embed API is initialized
+        let isAdobeAPIInitialized = false;
 
-            async function fetchPDFBase64() {
+        // Initialize Adobe Embed API
+        document.addEventListener("adobe_dc_view_sdk.ready", function () {
+            window.adobeDCView = new AdobeDC.View({ clientId: "1dbd70b7c89545ff8d943d30eac2dcd4", divId: "adobe-dc-view" });
+            console.log('Adobe Embed API initialized.');
+            isAdobeAPIInitialized = true;  // Set the flag to true when initialized
+        });
+
+        async function submitForm() {
+            const roles = document.getElementById('roles').value;
+            const industry = document.getElementById('industry').value;
+            const companyName = document.getElementById('companyName').value;
+            const participantNames = document.getElementById('participantNames').value;
+            const companySituation = document.getElementById('companySituation').value;
+
+            try {
+                // Call Power Automate flow
                 const response = await fetch('https://prod-15.canadacentral.logic.azure.com:443/workflows/8151b9e5c79a424faddd0961abbc0494/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IkqSmmRpGzgxMWKyPqWiTZGfcN7_ymngmde6-ABJZcE', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        roles: document.getElementById('roles').value,
-                        industry: document.getElementById('industry').value,
-                        companyName: document.getElementById('companyName').value,
-                        participantNames: document.getElementById('participantNames').value,
-                        companySituation: document.getElementById('companySituation').value
-                    })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ roles, industry, companyName, participantNames, companySituation })
                 });
 
                 if (!response.ok) {
@@ -46,68 +56,46 @@
                 }
 
                 const data = await response.json();
-                return data.pdfBase64;  // Assume the response contains the base64 PDF under pdfBase64
-            }
+                console.log('Response Data:', data);  // Debug: Inspect the structure of the response
 
-            // Convert base64 to ArrayBuffer
-            function base64ToArrayBuffer(base64) {
-                var binaryString = window.atob(base64);
-                var len = binaryString.length;
-                var bytes = new Uint8Array(len);
-                for (var i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
+                // Access pdfUrl directly from the data object
+                const pdfUrl = data.pdfUrl; 
+                console.log('PDF URL:', pdfUrl);
+
+                // Wait until the Adobe Embed API is initialized
+                if (pdfUrl) {
+                    if (isAdobeAPIInitialized) {
+                        // Use Adobe Embed API to preview the PDF
+                        window.adobeDCView.previewFile({
+                            content: { location: { url: pdfUrl } },
+                            metaData: { fileName: "index.pdf" }
+                        }, {});
+                        console.log('PDF is being displayed.');
+                    } else {
+                        console.error('Adobe Embed API is not initialized. Waiting for initialization...');
+                        // Wait for initialization and retry after a delay
+                        waitForAdobeAPIInitialization(pdfUrl);
+                    }
+                } else {
+                    console.error('PDF URL not found in response:', data);
                 }
-                return bytes.buffer;
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
             }
+        }
 
-            // Main function to fetch PDF and render using Adobe PDF Embed API
-            async function submitForm() {
-                try {
-                    const base64 = await fetchPDFBase64();
-                    const arrayBuffer = base64ToArrayBuffer(base64);
-
-                    // Define linearizationInfoObject and promise for content
-                    const linearizationInfoObject = {
-                        getInfo: () => getInfo(arrayBuffer),
-                        getInitialBuffer: () => getInitialBuffer(arrayBuffer),
-                        getFileBufferRanges: ranges => getFileBufferRanges(arrayBuffer, ranges)
-                    };
-
-                    // Render PDF using AdobeDC View in Promise Mode
-                    adobeDCView.previewFile({
-                        content: {
-                            promise: Promise.resolve(arrayBuffer),
-                            linearizationInfo: linearizationInfoObject
-                        },
-                        metaData: { fileName: "sample.pdf" }
-                    }, {
-                        enableLinearization: true,
-                    });
-                } catch (error) {
-                    console.error('Error rendering PDF:', error);
-                }
+        // Function to wait for Adobe API to be initialized
+        function waitForAdobeAPIInitialization(pdfUrl) {
+            if (isAdobeAPIInitialized) {
+                window.adobeDCView.previewFile({
+                    content: { location: { url: pdfUrl } },
+                    metaData: { fileName: "index.pdf" }
+                }, {});
+                console.log('PDF is being displayed after waiting.');
+            } else {
+                setTimeout(() => waitForAdobeAPIInitialization(pdfUrl), 500);  // Check every 500 ms
             }
-
-            // Helper functions for linearizationInfoObject
-            function getInfo(arrayBuffer) {
-                return new Promise((resolve, reject) => {
-                    resolve({ fileSize: arrayBuffer.byteLength });
-                });
-            }
-
-            function getInitialBuffer(arrayBuffer) {
-                return new Promise((resolve, reject) => {
-                    resolve({ buffer: arrayBuffer.slice(0, 65536) });  // Example: return first 64KB
-                });
-            }
-
-            function getFileBufferRanges(arrayBuffer, ranges) {
-                return new Promise((resolve, reject) => {
-                    const bufferList = ranges.map(range => arrayBuffer.slice(range.start, range.end + 1));
-                    resolve({ bufferList });
-                });
-            }
-        });
+        }
     </script>
 </body>
 </html>
